@@ -7,6 +7,8 @@ package uroflowmetrygui.GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -27,6 +29,8 @@ public class MainWindow extends JFrame {
     private JButton investButton;
     private JButton connectButton;
     private JButton calibrateButton;
+    
+    public boolean recordData;
    
     
     
@@ -72,6 +76,43 @@ public class MainWindow extends JFrame {
         // Format the menubar objects
         connectButton.setEnabled(false);
 
+    }
+    
+    private void setInvestBtnFunction(){
+        
+    investButton.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                if (investButton.getText().equals("Investigation")){
+                    System.out.println("Investigation time");
+                    investButton.setText("Connect to Device");
+                    investButton.setEnabled(false);
+                    connectButton.setEnabled(true);
+                    calibrateButton.setEnabled(false);
+                }
+                else if (investButton.getText().equals("Start")){
+                    System.out.println("Startin time");
+                    connectButton.setEnabled(false);
+                    recordData=true;
+                    investButton.setText("Stop");
+                }
+                else if (investButton.getText().equals("Stop")){
+                    System.out.println("Stoppin time");
+                    connectButton.setEnabled(true);
+                    recordData=false;
+                    investButton.setText("Save data");
+                }
+                else if (investButton.getText().equals("Save data")){
+                    System.out.println("Savin time");
+                    investButton.setText("Investigation");
+                    connectButton.setEnabled(false);
+                    calibrateButton.setEnabled(true);
+                    
+                }     
+            }
+        }
+        );
     }
     
     
