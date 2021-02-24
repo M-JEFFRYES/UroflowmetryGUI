@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import uroflowmetrygui.IO.SaveInvestigation;
 
 /**
  *
@@ -35,6 +36,9 @@ public class MainWindow extends JFrame {
     
     public boolean recordData;
    
+    private UroflowTrace uroflowTrace;
+    
+    private SaveInvestigation dataWriter;
     
     
     public MainWindow(){
@@ -46,7 +50,12 @@ public class MainWindow extends JFrame {
         
         // Add the top menu bar to the window
         createMenuBar();
-       
+        
+        // Uroflow plot added to window
+        createUroflowTrace();
+        
+        
+           
     }
     
     private void setScreenDimensions(){
@@ -83,9 +92,14 @@ public class MainWindow extends JFrame {
         SerialPort[] portNames = SerialPort.getCommPorts();
 	for (int i = 0; i < portNames.length; i++)
             portList.addItem(portNames[i].getSystemPortName());
+        
+
     }
     
     private void setInvestBtnFunction(){
+        
+        // Create the data writer for save button
+        dataWriter = new SaveInvestigation();
         
         investButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
@@ -108,11 +122,15 @@ public class MainWindow extends JFrame {
                     connectButton.setEnabled(true);
                     recordData=false;
                     investButton.setText("Save data");
+                    
+                    dataWriter.loadInvestigationData(uroflowTrace.getDataset());
                 }
                 else if (investButton.getText().equals("Save data")){
                     System.out.println("Investigation data saved");
                     investButton.setText("Investigation");
-                    calibrateButton.setEnabled(true);                    
+                    calibrateButton.setEnabled(true);
+
+                    dataWriter.saveInvestigation("file-to-save-to.csv");
                 }     
             }
         }
@@ -133,7 +151,7 @@ public class MainWindow extends JFrame {
         );
     }
     
-       private void setConnectButtonFunction(){
+    private void setConnectButtonFunction(){
         connectButton.addActionListener(new ActionListener(){
             @Override public void actionPerformed(ActionEvent arg0) {
 		if(connectButton.getText().equals("Connect")) {
@@ -161,8 +179,8 @@ public class MainWindow extends JFrame {
                                         float x = Float.parseFloat(datapoint[0]);
                                         float y = Float.parseFloat(datapoint[1]);
                                     
-                                        //trace.addData(x, y);
-                                        //trace.addData(x, convFactors.convertRawData(y));
+                                        uroflowTrace.addData(x, y);
+                                        //uroflowTrace.addData(x, convFactors.convertRawData(y));
                                     } else {
                                     } 
 				} catch(Exception e) {}
@@ -184,6 +202,7 @@ public class MainWindow extends JFrame {
     }
        
     private void createUroflowTrace(){
-        
+        uroflowTrace = new UroflowTrace(screenWidth, screenHeight);
+        add(uroflowTrace, BorderLayout.CENTER);
     }    
 }

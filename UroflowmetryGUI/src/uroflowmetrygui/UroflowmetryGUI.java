@@ -5,6 +5,8 @@
  */
 package uroflowmetrygui;
 
+import uroflowmetrygui.GUI.MainWindow;
+
 /**
  *
  * @author mikej
@@ -15,7 +17,9 @@ public class UroflowmetryGUI {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        MainWindow window = new MainWindow();
+        
+        window.setVisible(true);
     }
     
 }

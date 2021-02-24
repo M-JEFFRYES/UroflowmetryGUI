@@ -112,6 +112,9 @@ public class UroflowTrace extends JPanel {
         repaint(); // Refresh the plot window
     }
     
+    
+    public XYSeriesCollection getDataset(){return dataset;}
+    
  
 }
    
