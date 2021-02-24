@@ -5,10 +5,12 @@
  */
 package uroflowmetrygui.GUI;
 
+import com.fazecast.jSerialComm.SerialPort;
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -26,6 +28,7 @@ public class MainWindow extends JFrame {
     
     private JPanel menuBar;
     private JComboBox<String> portList;
+    private static SerialPort chosenPort;
     private JButton investButton;
     private JButton connectButton;
     private JButton calibrateButton;
@@ -43,9 +46,6 @@ public class MainWindow extends JFrame {
         
         // Add the top menu bar to the window
         createMenuBar();
-        
-        
-        
        
     }
     
@@ -75,47 +75,115 @@ public class MainWindow extends JFrame {
         
         // Format the menubar objects
         connectButton.setEnabled(false);
-
+        setInvestBtnFunction();
+        setCalibrateButtonFunction();
+        setConnectButtonFunction();
+        
+        // Get available serial ports and populate dropdown
+        SerialPort[] portNames = SerialPort.getCommPorts();
+	for (int i = 0; i < portNames.length; i++)
+            portList.addItem(portNames[i].getSystemPortName());
     }
     
     private void setInvestBtnFunction(){
         
-    investButton.addActionListener(new ActionListener()
-        {
+        investButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             {
                 if (investButton.getText().equals("Investigation")){
-                    System.out.println("Investigation time");
+                    System.out.println("Connect to uroflowmetry device");
                     investButton.setText("Connect to Device");
                     investButton.setEnabled(false);
                     connectButton.setEnabled(true);
                     calibrateButton.setEnabled(false);
                 }
                 else if (investButton.getText().equals("Start")){
-                    System.out.println("Startin time");
+                    System.out.println("Investigation started");
                     connectButton.setEnabled(false);
                     recordData=true;
                     investButton.setText("Stop");
                 }
                 else if (investButton.getText().equals("Stop")){
-                    System.out.println("Stoppin time");
+                    System.out.println("Investigation stoppped");
                     connectButton.setEnabled(true);
                     recordData=false;
                     investButton.setText("Save data");
                 }
                 else if (investButton.getText().equals("Save data")){
-                    System.out.println("Savin time");
+                    System.out.println("Investigation data saved");
                     investButton.setText("Investigation");
-                    connectButton.setEnabled(false);
-                    calibrateButton.setEnabled(true);
-                    
+                    calibrateButton.setEnabled(true);                    
                 }     
             }
         }
         );
     }
     
+    private void setCalibrateButtonFunction(){
+        
+        calibrateButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {
+                System.out.println("Begin calibration process");
+                connectButton.setEnabled(true);
+                investButton.setEnabled(false);
+                calibrateButton.setEnabled(false);
+            }
+        }
+        );
+    }
     
-    
-    
+       private void setConnectButtonFunction(){
+        connectButton.addActionListener(new ActionListener(){
+            @Override public void actionPerformed(ActionEvent arg0) {
+		if(connectButton.getText().equals("Connect")) {
+                    investButton.setEnabled(true);
+                    investButton.setText("Start");
+                    
+                    // attempt to connect to the serial port
+                    chosenPort = SerialPort.getCommPort(portList.getSelectedItem().toString());
+                    chosenPort.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+                    if(chosenPort.openPort()) {
+			connectButton.setText("Disconnect");
+			portList.setEnabled(false);
+                    }
+					
+                    // create a new thread that listens for incoming text and populates the graph
+                    Thread thread = new Thread(){
+                        @Override public void run() {
+                            Scanner scanner = new Scanner(chosenPort.getInputStream());
+                            while(scanner.hasNextLine()) {
+				try {
+                                    if (recordData){
+                                        String line = scanner.nextLine();
+                                        String[] datapoint = line.split(",");
+                                        //int number = Integer.parseInt(line);
+                                        float x = Float.parseFloat(datapoint[0]);
+                                        float y = Float.parseFloat(datapoint[1]);
+                                    
+                                        //trace.addData(x, y);
+                                        //trace.addData(x, convFactors.convertRawData(y));
+                                    } else {
+                                    } 
+				} catch(Exception e) {}
+                            }
+                            scanner.close();
+			}
+                    };
+                    thread.start();
+		} else {
+                    // disconnect from the serial port
+                    chosenPort.closePort();
+                    portList.setEnabled(true);
+                    connectButton.setText("Connect");
+                    //trace.volumeSeries.clear();
+                    //x = 0;
+		}
+            }
+	});
+    }
+       
+    private void createUroflowTrace(){
+        
+    }    
 }
