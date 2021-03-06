@@ -118,6 +118,7 @@ public class DatasetReader {
             if (lineNo>1){
                 volumeSeries.add(Double.parseDouble(points[0]), Double.parseDouble(points[1]));
                 flowrateSeries.add(Double.parseDouble(points[0]), Double.parseDouble(points[2]));
+                System.out.println(Double.parseDouble(points[1])+"-----"+Double.parseDouble(points[2]));
             } else {}
             
             lineNo++;

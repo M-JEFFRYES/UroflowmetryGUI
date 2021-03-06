@@ -24,8 +24,8 @@ public class UroflowTrace extends JPanel {
     // Chart Variables
     private int chartWidth;
     private int chartHeight;
-    private XYSeries volumeSeries;
-    private XYSeries flowrateSeries;
+    public XYSeries volumeSeries;
+    public XYSeries flowrateSeries;
     private XYSeriesCollection dataset;
     JFreeChart chart;
     
@@ -72,7 +72,7 @@ public class UroflowTrace extends JPanel {
        
         //domainAxis.setRange(0.0, 100.0); //X-axis
         //domainAxis.setTickUnit(new NumberTickUnit(100));
-        rangeAxis.setRange(0.0, 1000.0); //Y-axis
+        rangeAxis.setRange(0.0, 500.0); //Y-axis
         //rangeAxis.setTickUnit(new NumberTickUnit(0.05));
 
         ChartPanel chartPanel = new ChartPanel(chart);
@@ -82,9 +82,10 @@ public class UroflowTrace extends JPanel {
         add(chartPanel);
     }
     
-    
-    
-
+    public void updateChartTitle(String patFirstName, String patLastName, String Date){
+        String title = "Uroflowmetry --- "+Date+" (" + patLastName+", " + patFirstName + ")";
+        chart.setTitle(title);
+    }
     
     private void calculateFlowrate(float x1, float x2, float y1, float y2){
         flowrate = (y2-y1)/(x2-x1);
@@ -112,8 +113,20 @@ public class UroflowTrace extends JPanel {
         repaint(); // Refresh the plot window
     }
     
-    
     public XYSeriesCollection getDataset(){return dataset;}
+    
+    public void loadDatasets(XYSeries volumeSeries, XYSeries flowrateSeries){
+        
+        this.volumeSeries.clear();
+        this.flowrateSeries.clear();
+        
+        for (int i=0; i< volumeSeries.getItemCount(); i++){
+            this.volumeSeries.add(volumeSeries.getX(i), volumeSeries.getY(i));
+            this.flowrateSeries.add(flowrateSeries.getX(i), flowrateSeries.getY(i));
+        }
+        repaint();
+    }
+    
     
  
 }

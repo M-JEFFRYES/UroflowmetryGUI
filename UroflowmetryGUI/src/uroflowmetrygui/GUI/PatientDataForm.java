@@ -28,16 +28,15 @@ import javax.swing.JTextField;
  */
 public class PatientDataForm extends JFrame {
     
-    private JPanel form;
     private GridBagConstraints c;
     
     public boolean patInfoAdded;
     public boolean infoSent;
     private HashMap<String, String> patInformation;
     
-    ArrayList<JLabel> labels;
-    String[] fieldLabels;
-    ArrayList<JTextField> textFields;
+    private ArrayList<JLabel> labels;
+    private String[] fieldLabels;
+    private ArrayList<JTextField> textFields;
    
     private JLabel invDateLAB;
     private JLabel invDate;
@@ -55,10 +54,6 @@ public class PatientDataForm extends JFrame {
     private JTextField clinicianNameEntry;
     
     public JButton submitBTN;
-    
-    
-    
-    
     
     public PatientDataForm(){
         super();
@@ -120,7 +115,6 @@ public class PatientDataForm extends JFrame {
         textFields.add(clinicianNameEntry);
         
         for (int i=0; i<(textFields.size());i++){
-            System.out.println(labels.get(i).getText());
             addFormField(labels.get(i), textFields.get(i), (i+1), 0);
         }
         
@@ -179,12 +173,7 @@ public class PatientDataForm extends JFrame {
                     patInfoAdded = true;
                     submitBTN.setText("Add Information to trial");
                     
-                } /*else if (submitBTN.getText().equals("Add Information to trial")){
-                    submitBTN.setText("Close Window");
-                    System.out.println("add method to send pat info");
-                    
-                } */
-                else if (submitBTN.getText().equals("Close Window"))
+                } else if (submitBTN.getText().equals("Close Window"))
                     if (infoSent){
                         dispose();
                     } else {
@@ -203,10 +192,13 @@ public class PatientDataForm extends JFrame {
         for (int i=0; i<(textFields.size());i++){
             patInformation.put(fieldLabels[i], textFields.get(i).getText());
         }
+        String date = patInformation.get("InvestigationDate");
+        
+        String trialRef = date.substring(6,10)+"_"+date.substring(3,5)+"_"+date.substring(0,2)+"_"+
+                patInformation.get("LastName")+"_"+patInformation.get("FirstName");
+        
+        patInformation.put("TrialRef", trialRef);
     }
     
-    public HashMap<String, String> getPatientInfo(){
-        return patInformation;
-    } 
-           
+    public HashMap<String, String> getPatientInfo(){return patInformation;}       
 }
