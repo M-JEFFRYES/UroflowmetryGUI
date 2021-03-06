@@ -26,6 +26,7 @@ public class MainWindow extends JFrame {
     public int screenWidth;
     public int screenHeight;
     private Toolkit tk;
+    private JPanel mainContent;
     
     private JPanel menuBar;
     private JComboBox<String> portList;
@@ -37,6 +38,7 @@ public class MainWindow extends JFrame {
     public boolean recordData;
    
     private UroflowTrace uroflowTrace;
+    private CalibrateTrace calibrateTrace;
     
     private SaveInvestigation dataWriter;
     
@@ -54,8 +56,6 @@ public class MainWindow extends JFrame {
         // Uroflow plot added to window
         createUroflowTrace();
         
-        
-           
     }
     
     private void setScreenDimensions(){
@@ -99,12 +99,13 @@ public class MainWindow extends JFrame {
     private void setInvestBtnFunction(){
         
         // Create the data writer for save button
-        dataWriter = new SaveInvestigation();
+        //dataWriter = new SaveInvestigation();
         
         investButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e)
             {
                 if (investButton.getText().equals("Investigation")){
+                    
                     System.out.println("Connect to uroflowmetry device");
                     investButton.setText("Connect to Device");
                     investButton.setEnabled(false);
@@ -143,6 +144,9 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e)
             {
                 System.out.println("Begin calibration process");
+                
+                createCalibrateTrace(); // Change plot
+                
                 connectButton.setEnabled(true);
                 investButton.setEnabled(false);
                 calibrateButton.setEnabled(false);
@@ -194,8 +198,6 @@ public class MainWindow extends JFrame {
                     chosenPort.closePort();
                     portList.setEnabled(true);
                     connectButton.setText("Connect");
-                    //trace.volumeSeries.clear();
-                    //x = 0;
 		}
             }
 	});
@@ -204,5 +206,12 @@ public class MainWindow extends JFrame {
     private void createUroflowTrace(){
         uroflowTrace = new UroflowTrace(screenWidth, screenHeight);
         add(uroflowTrace, BorderLayout.CENTER);
-    }    
+    }
+    
+    private void createCalibrateTrace(){
+        calibrateTrace = new CalibrateTrace(screenWidth, screenHeight);
+        add(calibrateTrace, BorderLayout.CENTER);
+    }
+
+     
 }
